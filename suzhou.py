@@ -26,16 +26,17 @@ hds=[{'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) 
 # df = pd.DataFrame(raw_data, columns=['城市', '小区名','地址', '住宅类型','均价'],index=[0])
 df=pd.DataFrame()
 
-url = 'http://sh.fang.lianjia.com/'
-req = urllib.request.Request(url, headers=hds[random.randint(0,len(hds)-1)])
-html = urllib.request.urlopen(req).read()
-rPage =  re.compile(r' page-data="{&quot;totalPage&quot;:(.+?),&quot;curPage&quot;:1}">')
+url = 'http://su.lianjia.com/xiaoqu/'
+# req = urllib.request.Request(url, headers=hds[random.randint(0,len(hds)-1)])
+html = urllib.request.urlopen(url).read()
+print(len(html))
+rPage =  re.compile(r'<a href="/xiaoqu/d100" gahref="results_totalpage">(.+?)</a>')
 print(rPage.findall(html.decode('utf-8')))
 pageNum = int(rPage.findall(html.decode('utf-8'))[0])
-r = re.compile(r'href="/detail/.+">([^<].+?)</a>')
-r1 = re.compile(r'</span>】(.+?)</span>')
-r2 = re.compile(r'<span class="num">(.+?)</span>')
-r3 = re.compile(r'<span class="normal-house">\r\n\s+?<span>(.+?)</span>\r\n\s+?</span>\r\n')
+r = re.compile(r'<a name="selectDetail".+">([^<].+?)</a>')
+r1 = re.compile(r'districtName="(.+?)"\splateName="(.+?)"')
+r2 = re.compile(r'<span class="num">(.+?)\r\n\s+?\r\n\t+?<img src')
+# r3 = re.compile(r'<span class="normal-house">\r\n\s+?<span>(.+?)</span>\r\n\s+?</span>\r\n')
 
 
 lpList = []
@@ -46,42 +47,53 @@ for i in range(pageNum):
 	if i==0:
 		print(len(html))
 		lpName=r.findall(html.decode('utf-8'))
-		addr=r1.findall(html.decode('utf-8'))
+		# print(lpName)
+		addr_tmp=r1.findall(html.decode('utf-8'))
+		addr = []
+		for x in range(len(addr_tmp)):
+			addr.append(addr_tmp[x][0]+addr_tmp[x][1])
+		# print(addr)
 		avgCost=r2.findall(html.decode('utf-8'))
-		liveStyle = r3.findall(html.decode('utf-8'))
-		length = min(len(lpName), len(addr), len(avgCost),len(liveStyle))
+		# print(avgCost)
+		# liveStyle = r3.findall(html.decode('utf-8'))
+		length = min(len(lpName), len(addr), len(avgCost))
 		lpList.extend(lpName[0:length])
 		addrList.extend(addr[0:length])
 		avgCostList.extend(avgCost[0:length])
-		liveStyleList.extend(liveStyle[0:length])
+		# liveStyleList.extend(liveStyle[0:length])
 		# for j in range(length):
 		# 	print(lpName[j])
 		# 	print(addr[j])
 		# 	print(avgCost[j])
 		# 	print(liveStyle[j])
 	else:
-		# print(i)
+	# 	# print(i)
 		html_tmp = ''
-		req = urllib.request.Request(url+'list/pg'+str(i+1), headers=hds[random.randint(0,len(hds)-1)])
-		html_tmp = urllib.request.urlopen(req).read()
-		print(len(html_tmp))
+		url_tmp = url+'d'+str(i+1)
+		# req = urllib.request.Request(url_tmp, headers=hds[random.randint(0,len(hds)-1)])
+		html_tmp = urllib.request.urlopen(url_tmp).read()
+	# 	print(len(html_tmp))
 		lpName=r.findall(html_tmp.decode('utf-8'))
-		addr=r1.findall(html_tmp.decode('utf-8'))
+	# 	addr=r1.findall(html_tmp.decode('utf-8'))
+		addr_tmp=r1.findall(html.decode('utf-8'))
+		addr = []
+		for x in range(len(addr_tmp)):
+			addr.append(addr_tmp[x][0]+addr_tmp[x][1])
 		avgCost=r2.findall(html_tmp.decode('utf-8'))
-		liveStyle = r3.findall(html_tmp.decode('utf-8'))
-		length = min(len(lpName), len(addr), len(avgCost),len(liveStyle))
+	# 	liveStyle = r3.findall(html_tmp.decode('utf-8'))
+		length = min(len(lpName), len(addr), len(avgCost))
 		lpList.extend(lpName[0:length])
 		addrList.extend(addr[0:length])
 		avgCostList.extend(avgCost[0:length])
-		liveStyleList.extend(liveStyle[0:length])
+	# 	liveStyleList.extend(liveStyle[0:length])
 		# for j in range(length):
 		# 	print(lpName[j])
 		# 	print(addr[j])
 		# 	print(avgCost[j])
 		# 	print(liveStyle[j])
 # print(lpList)
-raw_data={'城市':'sh', '小区名':lpList, '地址':addrList, '住宅类型':liveStyleList,'均价':avgCostList}
+raw_data={'城市':'su', '小区名':lpList, '地址':addrList, '住宅类型':'','均价':avgCostList}
 df = pd.DataFrame(raw_data, columns=['城市', '小区名','地址', '住宅类型','均价'])
 
-df.to_csv('./quanguo/sh.csv')
+df.to_csv('./quanguo/suzhou.csv')
 
