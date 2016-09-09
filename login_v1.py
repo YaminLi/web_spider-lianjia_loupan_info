@@ -171,4 +171,6 @@ if __name__=="__main__":
     # username = input("username:")
     # pwd = input('password:')
     # getXiaoquID(username, pwd)
-    getTransList()
+    # getTransList()
+    login('', '')
+

@@ -78,7 +78,7 @@ def login(username, password):
 def getDistrictName(username, password):
     s=login(username, password)
     chengjiao_url = 'http://cd.lianjia.com/chengjiao/'
-    res = s.get(chengjiao_url)  
+    res = s.get(chengjiao_url)
     # print(res.headers)
     content = res.content.decode('utf-8')
     # # print(content)
@@ -93,73 +93,75 @@ def getDistrictName(username, password):
     # print(links)
     # print(district)
     for i in range(len(links)):
-        url = 'http://cd.lianjia.com'+links[i]
-        res = s.get(url)
-        content = res.content.decode('utf-8')
-        pattern = re.compile(r'class="on">不限</a>(.+?)</div></dd></dl>')
-        tmp = pattern.findall(content)[0]
-        pattern = re.compile(r'<a href="/chengjiao/([^"].+?)">(.+?)</a>')
-        sub_links = []
-        sub_district = []
-        for j in range(len(pattern.findall(tmp))):
-            sub_links.append(pattern.findall(tmp)[j][0])
-            sub_district.append(pattern.findall(tmp)[j][1])
-        # print(sub_links)
-        print(sub_district)
-        path = 'D:\python\\trans_list\cd\\'
-        # print(sys.path[0])
-        new_path = os.path.join(path, district[i])
-        print(new_path)
-        if not os.path.isdir(new_path):
-            os.makedirs(new_path)
-        # for j in range(1):
-        for j in range(len(sub_links)):
-            # print(sub_links[j])
-            url = 'http://cd.lianjia.com/chengjiao/'+sub_links[j]
+        print(links[i])
+        if links[i] == 'asf':
+            url = 'http://cd.lianjia.com'+links[i]
             res = s.get(url)
             content = res.content.decode('utf-8')
-            rPage =  re.compile(r'page-data=\'{"totalPage":(.+?),"curPage":')
-            total_page = int(rPage.findall(content)[0])
-            info = {'id':[], 'name':[], 'type':[], 'size':[], 'direction':[],'floor':[], 'year':[], 'signTime':[], 'signSource':[], 'unitPrice':[], 'unit':[], 'signPrice':[]}
-            ptn_get_xiaoqu_info = re.compile(r'<h2><a href="http://cd.lianjia.com/chengjiao/(.+?)\.html" target="_blank">(.+?)</a></h2><div><div class="col-1 fl"><div class="other"><div class="con">(.+?)</div></div><div class="introduce">')
-            ptn_get_deal_info = re.compile(r'<div class="dealType"><div class="fl"><div class="div-cun">(.+?)</div><p>(.+?)</p></div><div class="fl"><div class="div-cun">(.+?)<span>(.+?)</span></div><p>签约单价</p></div><div class="fr"><div class="div-cun">(.+?)<span>(.+?)</span>')
-            # for k in range(1):
-            for k in range(total_page):
-                url = 'http://cd.lianjia.com/chengjiao/'+sub_links[j]+'pg'+str(k+1)
-                res =  s.get(url)
+            pattern = re.compile(r'class="on">不限</a>(.+?)</div></dd></dl>')
+            tmp = pattern.findall(content)[0]
+            pattern = re.compile(r'<a href="/chengjiao/([^"].+?)">(.+?)</a>')
+            sub_links = []
+            sub_district = []
+            for j in range(len(pattern.findall(tmp))):
+                sub_links.append(pattern.findall(tmp)[j][0])
+                sub_district.append(pattern.findall(tmp)[j][1])
+            # print(sub_links)
+            print(sub_district)
+            path = '/Users/Michael/Documents/Github/web_spider-lianjia_loupan_info/cd'
+            # print(sys.path[0])
+            new_path = os.path.join(path, district[i])
+            print(new_path)
+            if not os.path.isdir(new_path):
+                os.makedirs(new_path)
+            # for j in range(1):
+            for j in range(len(sub_links)):
+                # print(sub_links[j])
+                url = 'http://cd.lianjia.com/chengjiao/'+sub_links[j]
+                res = s.get(url)
                 content = res.content.decode('utf-8')
-                xiaoqu_info = ptn_get_xiaoqu_info.findall(content)
-                deal_info = ptn_get_deal_info.findall(content)
-                # for t in range(1):
-                for t in range(len(xiaoqu_info)):
-                    info['id'].append(xiaoqu_info[t][0])
+                rPage =  re.compile(r'page-data=\'{"totalPage":(.+?),"curPage":')
+                total_page = int(rPage.findall(content)[0])
+                info = {'id':[], 'name':[], 'type':[], 'size':[], 'direction':[],'floor':[], 'year':[], 'signTime':[], 'signSource':[], 'unitPrice':[], 'unit':[], 'signPrice':[]}
+                ptn_get_xiaoqu_info = re.compile(r'<h2><a href="http://cd.lianjia.com/chengjiao/(.+?)\.html" target="_blank">(.+?)</a></h2><div><div class="col-1 fl"><div class="other"><div class="con">(.+?)</div></div><div class="introduce">')
+                ptn_get_deal_info = re.compile(r'<div class="dealType"><div class="fl"><div class="div-cun">(.+?)</div><p>(.+?)</p></div><div class="fl"><div class="div-cun">(.+?)<span>(.+?)</span></div><p>签约单价</p></div><div class="fr"><div class="div-cun">(.+?)<span>(.+?)</span>')
+                # for k in range(1):
+                for k in range(total_page):
+                    url = 'http://cd.lianjia.com/chengjiao/'+sub_links[j]+'pg'+str(k+1)
+                    res =  s.get(url)
+                    content = res.content.decode('utf-8')
+                    xiaoqu_info = ptn_get_xiaoqu_info.findall(content)
+                    deal_info = ptn_get_deal_info.findall(content)
+                    # for t in range(1):
+                    for t in range(len(xiaoqu_info)):
+                        info['id'].append(xiaoqu_info[t][0])
 
-                    idx1 = xiaoqu_info[t][1].find(' ')
-                    # print(xiaoqu_info[t][1][0:idx1])
-                    info['name'].append(xiaoqu_info[t][1][0:idx1])
-                    idx2 = xiaoqu_info[t][1].rfind(' ')
-                    # print(xiaoqu_info[t][1][idx1+1:idx2])
-                    # print(xiaoqu_info[t][1][idx2+1:])
-                    info['type'].append(xiaoqu_info[t][1][idx1+1:idx2])
-                    info['size'].append(xiaoqu_info[t][1][idx2+1:])
+                        idx1 = xiaoqu_info[t][1].find(' ')
+                        # print(xiaoqu_info[t][1][0:idx1])
+                        info['name'].append(xiaoqu_info[t][1][0:idx1])
+                        idx2 = xiaoqu_info[t][1].rfind(' ')
+                        # print(xiaoqu_info[t][1][idx1+1:idx2])
+                        # print(xiaoqu_info[t][1][idx2+1:])
+                        info['type'].append(xiaoqu_info[t][1][idx1+1:idx2])
+                        info['size'].append(xiaoqu_info[t][1][idx2+1:])
 
-                    idx1 = xiaoqu_info[t][2].find('/')
-                    # print(xiaoqu_info[t][2][0:idx1])
-                    info['direction'].append(xiaoqu_info[t][2][0:idx1])
-                    idx2 = xiaoqu_info[t][2].rfind('/')
-                    # print(xiaoqu_info[t][2][idx1+1:idx2])
-                    # print(xiaoqu_info[t][2][idx2+1:])
-                    info['floor'].append(xiaoqu_info[t][2][idx1+1:idx2])
-                    info['year'].append(xiaoqu_info[t][2][idx2+1:])
+                        idx1 = xiaoqu_info[t][2].find('/')
+                        # print(xiaoqu_info[t][2][0:idx1])
+                        info['direction'].append(xiaoqu_info[t][2][0:idx1])
+                        idx2 = xiaoqu_info[t][2].rfind('/')
+                        # print(xiaoqu_info[t][2][idx1+1:idx2])
+                        # print(xiaoqu_info[t][2][idx2+1:])
+                        info['floor'].append(xiaoqu_info[t][2][idx1+1:idx2])
+                        info['year'].append(xiaoqu_info[t][2][idx2+1:])
 
-                    info['signTime'].append(deal_info[t][0])
-                    info['signSource'].append(deal_info[t][1])
-                    info['unitPrice'].append(deal_info[t][2])
-                    info['unit'].append(deal_info[t][3])
-                    info['signPrice'].append(deal_info[t][4])
-            raw_data={'id':info['id'], 'name':info['name'], 'type':info['type'], 'size':info['size'], 'direction':info['direction'], 'floor':info['floor'], 'year':info['year'],'signTime':info['signTime'], 'signSource':info['signSource'], 'unitPrice':info['unitPrice'], 'unit':info['unit'], 'signPrice':info['signPrice']}
-            df = pd.DataFrame(raw_data, columns=['id', 'name', 'type', 'size', 'direction', 'floor', 'year', 'signTime', 'signSource', 'unitPrice', 'unit', 'signPrice'])
-            df.to_csv('./trans_list/cd/'+district[i]+'/'+sub_district[j]+'.csv')
+                        info['signTime'].append(deal_info[t][0])
+                        info['signSource'].append(deal_info[t][1])
+                        info['unitPrice'].append(deal_info[t][2])
+                        info['unit'].append(deal_info[t][3])
+                        info['signPrice'].append(deal_info[t][4])
+                raw_data={'id':info['id'], 'name':info['name'], 'type':info['type'], 'size':info['size'], 'direction':info['direction'], 'floor':info['floor'], 'year':info['year'],'signTime':info['signTime'], 'signSource':info['signSource'], 'unitPrice':info['unitPrice'], 'unit':info['unit'], 'signPrice':info['signPrice']}
+                df = pd.DataFrame(raw_data, columns=['id', 'name', 'type', 'size', 'direction', 'floor', 'year', 'signTime', 'signSource', 'unitPrice', 'unit', 'signPrice'])
+                df.to_csv('./quanguo/cd/'+district[i]+'/'+sub_district[j]+'.csv')
 
 def getTransList():
     t=pd.read_csv('./quanguo1/xiaoqu/cd_id.csv', encoding='gbk')
@@ -187,7 +189,7 @@ def getTransList():
                 print(itemData[i]['resblockName'])
             #     for j in range(len(info_title)):
             #         info[info_title[j]].append(itemData[i][info_title[j]])
-            
+
             # for x in range(totalPage-1):
             #     url = 'http://'+cities[k]+'.lianjia.com/chengjiao/getinfo/?page=1&id='+xiaoqu_id[k]+'&type=resblock&p='+str(x+2)
             #     req = urllib.request.Request(url, headers=hds[random.randint(0,len(hds)-1)])
