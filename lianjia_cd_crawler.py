@@ -61,8 +61,8 @@ def login(username, password):
     # print(execution)
 
     data = {
-        'username': '18698576907',
-        'password': '000000Lym',
+        'username': 'username',
+        'password': 'password',
         'execution': execution,
         '_eventId': 'submit',
         'lt': lt,
